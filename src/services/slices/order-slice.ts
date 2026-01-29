@@ -35,20 +35,24 @@ const initialState: TOrderState = {
   currentOrder: null
 };
 
-export const createOrder = createAsyncThunk(
-  'order/create',
-  async (ingredients: string[], { rejectWithValue }) => {
-    try {
-      const response = await orderBurgerApi(ingredients);
-      if (!response.success) {
-        return rejectWithValue('Failed to create order');
-      }
-      return response.order;
-    } catch (error: any) {
+export const createOrder = createAsyncThunk<
+  TOrder,
+  string[],
+  { rejectValue: string }
+>('order/create', async (ingredients, { rejectWithValue }) => {
+  try {
+    const response = await orderBurgerApi(ingredients);
+    if (!response.success) {
+      return rejectWithValue('Failed to create order');
+    }
+    return response.order;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       return rejectWithValue(error.message || 'Network error');
     }
+    return rejectWithValue('Network error');
   }
-);
+});
 
 export const getFeeds = createAsyncThunk(
   'feeds',

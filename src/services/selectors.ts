@@ -19,3 +19,4 @@ export const selectOrderLoading = (state: RootState) => state.order.loading;
 
 export const selectUser = (state: RootState) => state.user.user;
 export const selectAuthChecked = (state: RootState) => state.user.isAuthChecked;
+export const getUserState = (state: RootState) => state.user;

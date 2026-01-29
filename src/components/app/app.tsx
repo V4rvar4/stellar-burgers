@@ -1,4 +1,10 @@
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useMatch
+} from 'react-router-dom';
 
 import {
   ConstructorPage,
@@ -26,6 +32,11 @@ const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const background = location.state?.background;
+
+  const feedOrderMatch = useMatch('/feed/:number');
+  const profileOrderMatch = useMatch('/profile/orders/:number');
+  const orderNumber =
+    feedOrderMatch?.params.number || profileOrderMatch?.params.number;
 
   useEffect(() => {
     dispatch(fetchUser());
@@ -109,7 +120,7 @@ const App = () => {
             path='/feed/:number'
             element={
               <Modal
-                title='Детали заказа'
+                title={`#0${orderNumber}`}
                 onClose={() => {
                   navigate(-1);
                 }}
@@ -131,7 +142,7 @@ const App = () => {
             element={
               <ProtectedRoute accessMode={AccessMode.AuthenticatedOnly}>
                 <Modal
-                  title='Детали заказа'
+                  title={`#0${orderNumber}`}
                   onClose={() => {
                     navigate(-1);
                   }}

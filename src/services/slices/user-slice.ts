@@ -27,41 +27,49 @@ export const initialState: TUserState = {
   isAuthenticated: false
 };
 
-export const registerUser = createAsyncThunk(
-  'user/register',
-  async (registerData: TRegisterData, { rejectWithValue }) => {
-    try {
-      const data = await registerUserApi(registerData);
-      if (!data.success) {
-        return rejectWithValue('Registration failed');
-      }
-      setCookie('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      return data;
-    } catch (error: any) {
+export const registerUser = createAsyncThunk<
+  { user: TUser; accessToken: string; refreshToken: string },
+  TRegisterData,
+  { rejectValue: string }
+>('user/register', async (registerData, { rejectWithValue }) => {
+  try {
+    const data = await registerUserApi(registerData);
+    if (!data.success) {
+      return rejectWithValue('Registration failed');
+    }
+    setCookie('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       return rejectWithValue(error.message || 'Network error');
     }
+    return rejectWithValue('Network error');
   }
-);
+});
 
-export const loginUser = createAsyncThunk(
-  'user/login',
-  async ({ email, password }: TLoginData, { rejectWithValue }) => {
-    try {
-      const response = await loginUserApi({ email, password });
-      if (!response.success) {
-        return rejectWithValue('Login failed');
-      }
-      setCookie('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
-      return response;
-    } catch (error: any) {
+export const loginUser = createAsyncThunk<
+  { user: TUser; accessToken: string; refreshToken: string },
+  TLoginData,
+  { rejectValue: string }
+>('user/login', async ({ email, password }, { rejectWithValue }) => {
+  try {
+    const response = await loginUserApi({ email, password });
+    if (!response.success) {
+      return rejectWithValue('Login failed');
+    }
+    setCookie('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    return response;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       return rejectWithValue(error.message || 'Network error');
     }
+    return rejectWithValue('Network error');
   }
-);
+});
 
-export const fetchUser = createAsyncThunk(
+export const fetchUser = createAsyncThunk<TUser, void, { rejectValue: string }>(
   'user/fetch',
   async (_, { rejectWithValue }) => {
     try {
@@ -70,36 +78,46 @@ export const fetchUser = createAsyncThunk(
         return rejectWithValue('Failed to fetch user');
       }
       return response.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Network error');
-    }
-  }
-);
-
-export const updateUser = createAsyncThunk(
-  'user/update',
-  async (userData: Partial<TRegisterData>, { rejectWithValue }) => {
-    try {
-      const response = await updateUserApi(userData);
-      if (!response?.success) {
-        return rejectWithValue('Failed to update user');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message || 'Network error');
       }
-      return response.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Network error');
+      return rejectWithValue('Network error');
     }
   }
 );
 
-export const logoutUser = createAsyncThunk(
+export const updateUser = createAsyncThunk<
+  TUser,
+  Partial<TRegisterData>,
+  { rejectValue: string }
+>('user/update', async (userData, { rejectWithValue }) => {
+  try {
+    const response = await updateUserApi(userData);
+    if (!response?.success) {
+      return rejectWithValue('Failed to update user');
+    }
+    return response.user;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return rejectWithValue(error.message || 'Network error');
+    }
+    return rejectWithValue('Network error');
+  }
+});
+
+export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   'user/logout',
   async (_, { rejectWithValue }) => {
     try {
       await logoutApi();
       localStorage.removeItem('refreshToken');
       deleteCookie('accessToken');
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Logout failed');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message || 'Logout failed');
+      }
+      return rejectWithValue('Logout failed');
     }
   }
 );
@@ -191,4 +209,5 @@ const userSlice = createSlice({
 });
 
 export const { clearUser, setAuthChecked } = userSlice.actions;
+
 export default userSlice.reducer;

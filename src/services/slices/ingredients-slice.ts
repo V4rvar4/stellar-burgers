@@ -15,17 +15,21 @@ export const initialState: TIngredientsState = {
   error: null
 };
 
-export const fetchIngredients = createAsyncThunk(
-  'ingredients/fetchAll',
-  async (_, { rejectWithValue }) => {
-    try {
-      const data = await getIngredientsApi();
-      return data;
-    } catch (error: any) {
+export const fetchIngredients = createAsyncThunk<
+  TIngredient[],
+  void,
+  { rejectValue: string }
+>('ingredients/fetchAll', async (_, { rejectWithValue }) => {
+  try {
+    const data = await getIngredientsApi();
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       return rejectWithValue(error.message || 'Failed to load ingredients');
     }
+    return rejectWithValue('Failed to load ingredients');
   }
-);
+});
 
 const ingredientsSlice = createSlice({
   name: 'ingredients',

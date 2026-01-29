@@ -6,14 +6,13 @@ import {
 } from '@reduxjs/toolkit';
 import { TIngredient, TConstructorIngredient, TOrder } from '../../utils/types';
 import { orderBurgerApi } from '../../utils/burger-api';
-import { RootState } from '../../services/store'; // путь к твоему store
+import { RootState } from '../../services/store';
 import { nanoid } from '@reduxjs/toolkit';
 
-// Состояние конструктора
 type TConstructorState = {
   bun: TIngredient | null;
   ingredients: TConstructorIngredient[];
-  // Состояния для оформления заказа
+
   orderRequest: boolean;
   orderModalData: TOrder | null;
   error: string | null;
@@ -27,27 +26,29 @@ export const initialState: TConstructorState = {
   error: null
 };
 
-// Асинхронное действие для оформления заказа
-export const makeOrder = createAsyncThunk(
-  'constructor/makeOrder',
-  async (ingredientsIds: string[], { rejectWithValue }) => {
-    try {
-      const response = await orderBurgerApi(ingredientsIds);
-      if (!response.success) {
-        return rejectWithValue('Failed to create order');
-      }
-      return response.order;
-    } catch (error: any) {
+export const makeOrder = createAsyncThunk<
+  TOrder,
+  string[],
+  { rejectValue: string }
+>('constructor/makeOrder', async (ingredientsIds, { rejectWithValue }) => {
+  try {
+    const response = await orderBurgerApi(ingredientsIds);
+    if (!response.success) {
+      return rejectWithValue('Failed to create order');
+    }
+    return response.order;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       return rejectWithValue(error.message || 'Network error');
     }
+    return rejectWithValue('Network error');
   }
-);
+});
 
 const constructorSlice = createSlice({
   name: 'constructor',
   initialState,
   reducers: {
-    // Добавление ингредиента
     addIngredient: {
       prepare: (item: TIngredient) => {
         const id = nanoid();
@@ -61,13 +62,13 @@ const constructorSlice = createSlice({
         }
       }
     },
-    // Удаление ингредиента по ID
+
     removeIngredient: (state, action: PayloadAction<string>) => {
       state.ingredients = state.ingredients.filter(
         (item) => item.id !== action.payload
       );
     },
-    // Перемещение ингредиента (по индексам)
+
     moveIngredient: (
       state,
       action: PayloadAction<{ fromIndex: number; toIndex: number }>
@@ -78,12 +79,12 @@ const constructorSlice = createSlice({
       items.splice(toIndex, 0, movedItem);
       state.ingredients = items;
     },
-    // Очистка конструктора
+
     clearConstructor: (state) => {
       state.bun = null;
       state.ingredients = [];
     },
-    // Очистка модального окна заказа
+
     clearOrderModal: (state) => {
       state.orderModalData = null;
     }
@@ -97,7 +98,7 @@ const constructorSlice = createSlice({
       .addCase(makeOrder.fulfilled, (state, action) => {
         state.orderRequest = false;
         state.orderModalData = action.payload;
-        // Очищаем конструктор после успешного заказа
+
         state.bun = null;
         state.ingredients = [];
       })
@@ -110,8 +111,7 @@ const constructorSlice = createSlice({
   }
 });
 
-// Селекторы
-const selectConstructorState = (state: RootState) => state.burgerConstructor; // <= изменено на 'burgerConstructor'
+const selectConstructorState = (state: RootState) => state.burgerConstructor;
 
 export const selectConstructorItems = createSelector(
   [selectConstructorState],
@@ -122,13 +122,12 @@ export const selectConstructorItems = createSelector(
 );
 
 export const selectOrderRequest = (state: RootState) =>
-  state.burgerConstructor.orderRequest; // <= изменено
+  state.burgerConstructor.orderRequest;
 export const selectOrderModalData = (state: RootState) =>
-  state.burgerConstructor.orderModalData; // <= изменено
+  state.burgerConstructor.orderModalData;
 export const selectOrderError = (state: RootState) =>
-  state.burgerConstructor.error; // <= изменено
+  state.burgerConstructor.error;
 
-// Экспортируем действия
 export const {
   addIngredient,
   removeIngredient,
