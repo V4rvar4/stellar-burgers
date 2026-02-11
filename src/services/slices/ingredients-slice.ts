@@ -3,7 +3,7 @@ import { getIngredientsApi } from '@api';
 import { TIngredient } from '../../utils/types';
 import { RootState } from '../store';
 
-type TIngredientsState = {
+export type TIngredientsState = {
   ingredients: TIngredient[];
   isIngredientsLoading: boolean;
   error: string | null;
@@ -31,7 +31,7 @@ export const fetchIngredients = createAsyncThunk<
   }
 });
 
-const ingredientsSlice = createSlice({
+export const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
   reducers: {},

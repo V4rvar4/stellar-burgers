@@ -9,8 +9,8 @@ import { orderBurgerApi } from '../../utils/burger-api';
 import { RootState } from '../../services/store';
 import { nanoid } from '@reduxjs/toolkit';
 
-type TConstructorState = {
-  bun: TIngredient | null;
+export type TConstructorState = {
+  bun: TConstructorIngredient | null;
   ingredients: TConstructorIngredient[];
 
   orderRequest: boolean;
@@ -45,7 +45,7 @@ export const makeOrder = createAsyncThunk<
   }
 });
 
-const constructorSlice = createSlice({
+export const constructorSlice = createSlice({
   name: 'constructor',
   initialState,
   reducers: {

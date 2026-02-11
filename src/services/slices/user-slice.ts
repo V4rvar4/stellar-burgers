@@ -11,7 +11,7 @@ import {
 } from '../../utils/burger-api';
 import { deleteCookie, setCookie } from '../../utils/cookie';
 
-type TUserState = {
+export type TUserState = {
   user: TUser | null;
   loading: boolean;
   error: string | null;
@@ -122,7 +122,7 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   }
 );
 
-const userSlice = createSlice({
+export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
