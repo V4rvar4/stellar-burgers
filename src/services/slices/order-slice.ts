@@ -14,16 +14,16 @@ type TCreateOrderState = {
   error: string | null;
 };
 
-type TFeedOrdersState = {
+export type TFeedOrdersState = {
   orders: TOrder[];
   total: number;
   totalToday: number;
   currentOrder: TOrder | null;
 };
 
-type TOrderState = TCreateOrderState & TFeedOrdersState;
+export type TOrderState = TCreateOrderState & TFeedOrdersState;
 
-const initialState: TOrderState = {
+export const initialState: TOrderState = {
   orderData: null,
   orderNumber: null,
   loading: false,
@@ -69,7 +69,7 @@ export const getOrderByNumber = createAsyncThunk(
   async (number: number) => await getOrderByNumberApi(number)
 );
 
-const orderSlice = createSlice({
+export const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {
